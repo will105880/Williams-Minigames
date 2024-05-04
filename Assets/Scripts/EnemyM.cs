@@ -24,6 +24,8 @@ public class EnemyM : MonoBehaviour
         if (collision.name != "Enemy")
         {
             Destroy(m_Enemy);
+            if (collision.name != "Player")
+                Destroy(collision.gameObject);
             m_Player.GetComponent<PlayerMovement>().updateScore();
         }
     }

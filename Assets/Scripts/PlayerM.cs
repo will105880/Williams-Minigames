@@ -23,63 +23,48 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Input.anyKey && !Input.GetKey(KeyCode.Space))
+        Vector3 MousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 newshoot = (MousePosition - new Vector3(rb.position.x,rb.position.y,0)).normalized;
+        float angle = Mathf.Atan2(newshoot.y,newshoot.x) * Mathf.Rad2Deg - 90;
+        gun.rotation = angle;
+        gun.position = rb.position + new Vector2(newshoot.x,newshoot.y).normalized * offset;
+        bulletDirection = newshoot;
+
+
+        if (Input.anyKey /*&& !Input.GetKey(KeyCode.Mouse0)*/)
         {
+            rb.velocity = Vector2.zero;
             if (Input.GetKey(KeyCode.W))
             {
                 rb.velocity = new Vector2(0.0f, Force);
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(0.0f, offset);
-                gun.rotation = 0f;
             }
             if (Input.GetKey(KeyCode.S))
             {
                 rb.velocity = new Vector2(0.0f, -Force);
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(0.0f, -offset);
-                gun.rotation = 0f;
             }
             if (Input.GetKey(KeyCode.A))
             {
                 rb.velocity = new Vector2(-Force, 0.0f);
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(-offset, 0.0f);
-                gun.rotation = 90f;
             }
             if (Input.GetKey(KeyCode.D))
             {
                 rb.velocity = new Vector2(Force, 0.0f);
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(offset, 0.0f);
-                gun.rotation = 90f;
             }
             if (Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.W))
             {
                 rb.velocity = new Vector2(Force, Force).normalized * Force;
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(offset, offset);
-                gun.rotation = 135f;
             }
             if (Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.S))
             {
                 rb.velocity = new Vector2(Force, -Force).normalized * Force;
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(offset, -offset);
-                gun.rotation = 225f;
             }
             if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.W))
             {
                 rb.velocity = new Vector2(-Force, Force).normalized * Force;
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(-offset, offset);
-                gun.rotation = 45f;
             }
             if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S))
             {
                 rb.velocity = new Vector2(-Force, -Force).normalized * Force;
-                bulletDirection = rb.velocity;
-                gun.position = rb.position + new Vector2(-offset, -offset);
-                gun.rotation = 315f;
             }
         }
         else
@@ -93,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             bullet2 = Instantiate(bullet, rb.position, Quaternion.identity);
-            bullet2.GetComponent<Rigidbody2D>().velocity = bulletDirection * 3f;
+            bullet2.GetComponent<Rigidbody2D>().velocity = bulletDirection.normalized * 3f * Force;
             Destroy(bullet2,5f);
             if (bullet2.GetComponent<Rigidbody2D>().velocity == Vector2.zero)
             {
@@ -114,6 +99,7 @@ public class PlayerMovement : MonoBehaviour
             deathScreen.SetActive(true);
             scoreCount -= 5;
             score.GetComponent<Text>().text = scoreCount.ToString();
+            Player.GetComponent<EnemySpawner>().dead = true;
             Player.SetActive(false);
         }
     }
@@ -122,7 +108,6 @@ public class PlayerMovement : MonoBehaviour
     {
         scoreCount += 5;
         score.GetComponent<Text>().text = scoreCount.ToString();
-        Destroy(bullet2);
     }
 
 }

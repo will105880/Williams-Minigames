@@ -15,6 +15,7 @@ public class EnemySpawner : MonoBehaviour
     float xrand = 0f;
     float count = 0;
     float x = 1;
+    public bool dead = false;
 
     void Start()
     {
@@ -30,6 +31,7 @@ public class EnemySpawner : MonoBehaviour
         }
         for(int i = 0; i < x; i++)
         {
+            if (!dead)
             repeat();
         }
         count += 1f;
